@@ -28,7 +28,7 @@ function App() {
         }
         const formData = new FormData();
         formData.append('image', file);
-        formData.append('metadata', JSON.stringify({ author: "John Doe" }));
+        formData.append('metadata', JSON.stringify({ author: "Gheorghe & Ion" }));
 
         axios.post('http://localhost:5000/upload', formData, {
             headers: {
