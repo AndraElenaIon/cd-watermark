@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './App.css'; // Import your CSS file for styling
 
 function App() {
     const [file, setFile] = useState(null);
@@ -41,12 +42,18 @@ function App() {
     };
 
     return (
-        <div>
+        <div className="container">
+            <div className="header">WATERMARKING APP</div>
             <form onSubmit={handleSubmit}>
                 <input type="file" onChange={handleImageChange} />
                 <button type="submit" onClick={handleSubmit}>Upload Image</button>
             </form>
-            {imagePreviewUrl && <img src={imagePreviewUrl} alt="Uploaded Image" />}
+            {imagePreviewUrl && (
+                <div>
+                    <img src={imagePreviewUrl} alt="Uploaded Image" className="preview-image" />
+                    <p>Watermarked image displayed</p>
+                </div>
+            )}
         </div>
     );
 }
