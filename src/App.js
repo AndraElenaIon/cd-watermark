@@ -44,12 +44,18 @@ function App() {
             .catch(err => console.log(err));
     };
 
+    const refreshPage = () => {
+        window.location.reload();
+    };
+
+
     return (
         <div className="container">
             <div className="header">WATERMARKING APP</div>
-            <form onSubmit={handleSubmit}>
+            <form className="form-container" onSubmit={handleSubmit}>
                 <input type="file" onChange={handleImageChange} />
-                <button type="submit" onClick={handleSubmit}>Upload Image</button>
+                <button type="submit" onClick={handleSubmit}>Apply Watermark</button>
+                <button type="button" onClick={refreshPage}>Refresh Page</button>
             </form>
             {imagePreviewUrl && (
                 <div>
