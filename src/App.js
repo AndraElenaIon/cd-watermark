@@ -5,6 +5,7 @@ import './App.css'; // Import your CSS file for styling
 function App() {
     const [file, setFile] = useState(null);
     const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+    const [watermarked, setWatermarked] = useState(false);
 
     const handleImageChange = (e) => {
         e.preventDefault();
@@ -14,6 +15,7 @@ function App() {
         reader.onloadend = () => {
             setFile(file);
             setImagePreviewUrl(reader.result);
+            setWatermarked(false); // Reset watermarked state when a new image is uploaded
         };
 
         reader.readAsDataURL(file);
@@ -37,6 +39,7 @@ function App() {
             .then(response => {
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 setImagePreviewUrl(url);
+                setWatermarked(true); // Set watermarked state to true after receiving the watermarked image
             })
             .catch(err => console.log(err));
     };
@@ -51,7 +54,7 @@ function App() {
             {imagePreviewUrl && (
                 <div>
                     <img src={imagePreviewUrl} alt="Uploaded Image" className="preview-image" />
-                    <p>Watermarked image displayed</p>
+                    {watermarked && <p>Watermarked image displayed</p>}
                 </div>
             )}
         </div>
