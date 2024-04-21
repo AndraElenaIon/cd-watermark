@@ -1,6 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import { createCanvas } from 'canvas';
-import CryptoJS from 'crypto-js'; // Asigură-te că ai importat CryptoJS
+import React, { useEffect, useState } from "react";
 
 const Watermark = ({
                      imageUrl,
@@ -10,68 +8,56 @@ const Watermark = ({
                      metadata,
                      isVisible,
                    }) => {
-  const canvasRef = useRef(null);
   const [watermarkImage, setWatermarkImage] = useState("");
 
   useEffect(() => {
     if (imageUrl) {
       const img = new Image();
-      img.crossOrigin = "anonymous";
+      img.crossOrigin = "anonymous";  // This is necessary to handle CORS when loading images from external URLs
       img.src = imageUrl;
       img.onload = () => {
-        const canvas = createCanvas(400, 400);
+        const canvas = document.createElement('canvas');
         const ctx = canvas.getContext("2d");
 
         canvas.width = img.width;
         canvas.height = img.height;
-
         ctx.drawImage(img, 0, 0);
 
-        // Adăugarea textului watermark
-        ctx.fillStyle = '#000000';
-        ctx.font = '24px Arial';
-        ctx.fillText(text, 10, 30);
+        // Add text watermark
+        ctx.fillStyle = '#000000';  // Set text color
+        ctx.font = '24px Arial';    // Set font size and type
+        ctx.fillText(text, 10, 30); // Position text in the canvas
 
-        // Adăugarea logo-ului ca watermark
+        // Conditionally add a logo watermark if a URL is provided
         if (logoUrl) {
           const logoImg = new Image();
           logoImg.crossOrigin = "anonymous";
           logoImg.src = logoUrl;
           logoImg.onload = () => {
+            // Draw logo at bottom-right corner, adjust positioning as needed
             ctx.drawImage(logoImg, canvas.width - logoImg.width - 10, canvas.height - logoImg.height - 10);
+            finishUp();
           };
+        } else {
+          finishUp();
         }
 
-        canvas.toBlob((blob) => {
-          const imageWithMetadata = new Image();
-          imageWithMetadata.src = URL.createObjectURL(blob);
-          imageWithMetadata.onload = () => {
-            console.log(metadata)
-            const encryptedData = encryptData(JSON.stringify(metadata), encryptionKey);
-            console.log(encryptedData);
-            // Presupunem că metadata este un obiect care trebuie convertit într-un șir
-            imageWithMetadata.metadata = encryptedData;
-            setWatermarkImage(imageWithMetadata.src);
-          };
-        }, 'image/jpeg', 1);
+        function finishUp() {
+          canvas.toBlob((blob) => {
+            const imageUrl = URL.createObjectURL(blob);
+            setWatermarkImage(imageUrl);
+          }, 'image/jpeg');
+        }
       };
     }
-  }, [imageUrl, text, logoUrl, metadata, encryptionKey]); // Actualizarea dependențelor pentru useEffect
+  }, [imageUrl, text, logoUrl, metadata, encryptionKey]); // Ensure all dependencies are listed here
 
-  // Funcție pentru criptarea datelor
-  const encryptData = (data, key) => {
-    const encrypted = CryptoJS.AES.encrypt(data, key).toString();
-    return encrypted;
-  };
+  if (!isVisible) {
+    return null;
+  }
 
   return (
-      <img
-          ref={canvasRef}
-          style={{ opacity: isVisible ? 1 : 0, marginTop: '70px' }}
-          src={watermarkImage}
-          width={"700px"}
-          alt=""
-      />
+      <img src={watermarkImage} alt="Watermarked Image" style={{ marginTop: '20px', maxWidth: '700px' }} />
   );
 };
 
